@@ -1,0 +1,111 @@
+{% extends "registration.html" %}
+{% block content %}
+
+  <style>
+.all-browsers {
+  margin: 0;
+  padding: 5px;
+  background-color: lightgray;
+}
+
+.all-browsers > h1, .browser {
+  margin: 10px;
+  padding: 5px;
+}
+
+.browser {
+  background: white;
+}
+
+.browser > h2, p {
+  margin: 4px;
+  font-size: 90%;
+}
+</style>
+  <article class="media all-browsers" id = "art">
+    <h1>All Posts
+    </h1>
+    <p>Click the following button to see the result: </p>
+    <form>
+       <input type = "button" value = "Click Me" onclick = "retreive();" />
+    </form>
+    <p>Click the following button to add a post: </p>
+    <form>
+       <label for="Titlep">Title:</label><br>
+       <input type = "text" id="Titlep" name="Titlep"/>
+       <label for="Bodyp">Text:</label><br>
+       <input type = "text" id="Bodyp" name="Bodyp"/>
+       <input type = "button" value = "Click Me" onclick = "add();" />
+    </form>
+    {% for post in posts %}
+    <article id = "output" class="media browser">
+      <div class="media-body">
+        <div class="article-metadata">
+          <a class="mr-2" href="#">{{ post.author }}</a>
+        </div>
+        <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+        <p class="article-content">{{ post.content }}</p>
+        </div>
+    </article>
+    {% endfor %}
+  </article>
+
+
+  <script type = "text/javascript">
+      function retreive() {//Retrieve the posts from the database
+        let obj1;
+          do{
+              var myobj = document.getElementById("output");
+              myobj.remove();
+              var myEle = document.getElementById("output");
+          }while(myEle)
+          fetch('https://jeffolai.herokuapp.com/getPosts', {mode: 'no-cors'})
+          .then(response => response.json())
+          .then(data => obj1 = data)
+          .then(obj1 => {
+            myobj = obj1["data"];
+            for(i = 0; i < myobj.length; i++){
+                var newDiv = document.createElement("article");//Create
+                var newContent = document.createTextNode(myobj[i]["fields"]["content"] + '\n');//Get the content fields
+                var newContent2 = document.createTextNode(myobj[i]["fields"]["title"]+ '\n');//Get the title of the posts
+                newDiv.id = "output";//Name them all output to allow for them to be deleted later
+                newDiv.appendChild(newContent2);//Append them to create a single post
+                newDiv.appendChild(newContent);
+                var currentDiv = document.getElementById("art");//Get the encompassing object and place the posts inside
+                currentDiv.appendChild(newDiv);
+            }
+          });
+      }
+</script>
+<script>
+  function add(){
+    var csrftoken = getCookie('csrftoken');
+    fetch('https://jeffolai.herokuapp.com/addforum', {
+      method: 'POST',
+      body: JSON.stringify({
+      title: document.getElementById("Titlep").value,
+      content: document.getElementById("Bodyp").value,
+      csrfmiddlewaretoken: csrftoken
+    }),
+    headers: {
+      'Content-type': 'application/json'
+    }
+    })
+    .then(response => response.json())
+    .then(json => console.log(json))
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+</script>
+<script>
+document.write=function(s){
+    var scripts = document.getElementsByTagName('script');
+    var lastScript = scripts[scripts.length-1];
+    lastScript.insertAdjacentHTML("beforebegin", s);
+}
+</script>
+{% endblock content %}

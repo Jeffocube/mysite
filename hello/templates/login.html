@@ -1,0 +1,24 @@
+{% extends "registration.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+  <form method = "POST">
+    {% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Log in here</legend>
+      {{ form|crispy  }}
+    </fieldset>
+    <div class = "">
+    <p><button class="w3-button w3-block w3-red w3-round" type = "submit">Log In</button></p>
+    </div>
+  </form>
+  <div class="border-top pt-3">
+    <small class="text-muted">
+      Not registered? <a class="ml-2" href="https://jeffolai.herokuapp.com/reg">Sign in</a>
+    </small>
+    <small class="text-muted">
+      Forgot password? <a class="ml-2" href="https://jeffolai.herokuapp.com/reg">Recover Password</a>
+    </small>
+  </div>
+</div>
+{% endblock content %}
